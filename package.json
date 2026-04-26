@@ -1,0 +1,32 @@
+{
+  "name": "rhythm",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "vexflow": "^5.0.0",
+    "tone": "^15.0.4"
+  },
+  "devDependencies": {
+    "vite": "^6.3.5",
+    "@vitejs/plugin-react": "^4.4.1",
+    "typescript": "^5.8.3",
+    "@types/react": "^19.1.4",
+    "@types/react-dom": "^19.1.5",
+    "tailwindcss": "^4.1.6",
+    "@tailwindcss/vite": "^4.1.6",
+    "vitest": "^3.1.3",
+    "@vitest/ui": "^3.1.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "jsdom": "^26.1.0"
+  }
+}
