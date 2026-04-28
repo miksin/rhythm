@@ -73,7 +73,7 @@ export function renderExercise(exercise: Exercise): RenderResult {
       return new StaveNote({
         keys: isRest ? ['b/4'] : ['b/4'],
         duration: duration,
-        stem_direction: 1,
+        stemDirection: 1,
       });
     });
 
