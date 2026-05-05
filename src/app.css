@@ -5,6 +5,7 @@
   --cell-bg: #FFFFFF;
   --border-note-1: #FFB5A7;
   --border-note-2: #A8D8EA;
+  --border-note-4: #FFDAB9;
   --border-rest: #C3AED6;
   --border-long: #B5EAD7;
   --active-bg: #FFDAC1;
@@ -163,6 +164,10 @@ h1 {
 
 .cell.note-2 {
   border-color: var(--border-note-2);
+}
+
+.cell.note-4 {
+  border-color: var(--border-note-4);
 }
 
 .cell.rest {
