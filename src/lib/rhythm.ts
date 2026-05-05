@@ -54,6 +54,16 @@ const PATTERNS: RhythmPattern[] = [
     weight: 3,
   },
   {
+    id: 'sixteenth-eighth-sixteenth',
+    label: '十六分+八分+十六分',
+    symbol: '♬♫♬',
+    duration: 1,
+    category: 'note-4',
+    difficulty: 'advanced',
+    subdivisions: [0, 0.25, 0.75],
+    weight: 3,
+  },
+  {
     id: 'eighth-pair',
     label: '八分音符×2',
     symbol: '♫',

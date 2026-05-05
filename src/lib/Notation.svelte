@@ -3,133 +3,155 @@
 
   let { pattern }: { pattern: RhythmPattern } = $props();
 
-  function noteX(fraction: number): number {
-    return 10 + fraction * 80;
+  const W = 100; // viewBox width per beat
+  const H = 36;
+  const cy = 15; // notehead center y
+  const stemTop = 3;
+  const beamH = 2.8;
+  const beamGap = 2;
+  const noteRx = 4.5;
+  const noteRy = 3;
+
+  function nx(frac: number): number {
+    return 8 + frac * 84;
   }
 
-  function notehead(cx: number, cy: number, filled: boolean): string {
+  function notehead(x: number, filled: boolean): string {
     const fill = filled ? 'currentColor' : 'none';
-    return `<ellipse cx="${cx}" cy="${cy}" rx="4.5" ry="3.2" fill="${fill}" stroke="currentColor" stroke-width="1"/>`;
+    return `<ellipse cx="${x}" cy="${cy}" rx="${noteRx}" ry="${noteRy}" fill="${fill}" stroke="currentColor" stroke-width="0.9"/>`;
   }
 
-  function stem(cx: number, y1: number, y2: number): string {
-    return `<line x1="${cx}" y1="${y1}" x2="${cx}" y2="${y2}" stroke="currentColor" stroke-width="1.2"/>`;
+  function stem(x: number): string {
+    return `<line x1="${x}" y1="${cy - noteRy}" x2="${x}" y2="${stemTop}" stroke="currentColor" stroke-width="1.1"/>`;
   }
 
-  function beam(x1: number, x2: number, y: number, h: number): string {
-    return `<rect x="${x1}" y="${y}" width="${x2 - x1}" height="${h}" fill="currentColor"/>`;
+  function beamElement(x1: number, x2: number, y: number): string {
+    const w = x2 - x1;
+    if (w <= 0) return '';
+    return `<polygon points="${x1},${y} ${x2},${y + 0.8} ${x2},${y + beamH + 0.8} ${x1},${y + beamH}" fill="currentColor"/>`;
   }
 
-  function flag(cx: number, y: number): string {
-    return `<path d="M${cx},${y} Q${cx + 8},${y + 5} ${cx + 10},${y + 12}" fill="none" stroke="currentColor" stroke-width="1.2"/>`;
+  function flag(x: number): string {
+    return `<path d="M${x},${stemTop} Q${x + 7},${stemTop + 5} ${x + 9},${stemTop + 13}" fill="none" stroke="currentColor" stroke-width="1.1"/>`;
+  }
+
+  function restQuarter(): string {
+    return `<path d="M${50 - 6},${cy - 6} L${50 + 4},${cy - 8} L${50 - 2},${cy} L${50 + 8},${cy - 2} L${50 + 2},${cy + 6} L${50 - 8},${cy + 4} Z" fill="currentColor"/>`;
+  }
+
+  function restEighth(x: number): string {
+    const cx = x;
+    return `<circle cx="${cx}" cy="${cy - 3}" r="2.2" fill="currentColor"/><path d="M${cx + 2},${cy - 3} Q${cx + 6},${cy + 2} ${cx + 4},${cy + 8}" fill="none" stroke="currentColor" stroke-width="1.1"/>`;
   }
 </script>
 
-<svg viewBox="0 0 100 32" class="notation" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 {W * pattern.duration} {H}" class="notation" xmlns="http://www.w3.org/2000/svg">
   {@html (() => {
-    const cy = 14;
-    const stemTop = 2;
-    const beamH = 3;
-    const beamGap = 1.5;
+    const d = pattern.duration;
+    const vbW = W * d;
+    // Center single notes in multi-beat cells
+    const offX = d > 1 ? (d - 1) * W / 2 : 0;
+
+    function nxf(frac: number): number {
+      return offX + 8 + frac * 84;
+    }
 
     switch (pattern.id) {
-      // ── Quarter ──
-      case 'quarter':
-        return notehead(50, cy, true) + stem(54.5, cy, stemTop);
+      case 'quarter': {
+        const x = nxf(0.5);
+        return notehead(x, true) + stem(x + noteRx);
+      }
 
-      // ── Half ──
-      case 'half':
-        return notehead(50, cy, false) + stem(54.5, cy, stemTop);
+      case 'half': {
+        const x = nxf(0.5);
+        return notehead(x, false) + stem(x + noteRx);
+      }
 
-      // ── Eighth pair ──
       case 'eighth-pair': {
-        const x1 = noteX(0), x2 = noteX(0.5);
-        const stemX1 = x1 + 4.5, stemX2 = x2 + 4.5;
-        return notehead(x1, cy, true) + notehead(x2, cy, true)
-          + stem(stemX1, cy, stemTop) + stem(stemX2, cy, stemTop)
-          + beam(stemX1 - 1, stemX2 + 1, stemTop, beamH);
+        const x0 = nxf(0), x1 = nxf(0.5);
+        const s0 = x0 + noteRx, s1 = x1 + noteRx;
+        return notehead(x0, true) + stem(s0) + notehead(x1, true) + stem(s1)
+          + beamElement(s0 - 1, s1 + 1, stemTop);
       }
 
-      // ── Four sixteenths ──
       case 'sixteenths': {
-        const xs = [noteX(0), noteX(0.25), noteX(0.5), noteX(0.75)];
-        const stemXs = xs.map(x => x + 4.5);
+        const xs = [nxf(0), nxf(0.25), nxf(0.5), nxf(0.75)];
+        const ss = xs.map(x => x + noteRx);
         let s = '';
-        for (let i = 0; i < 4; i++) {
-          s += notehead(xs[i], cy, true) + stem(stemXs[i], cy, stemTop);
-        }
-        s += beam(stemXs[0] - 1, stemXs[3] + 1, stemTop, beamH);
-        s += beam(stemXs[0] - 1, stemXs[3] + 1, stemTop + beamH + beamGap, beamH);
+        for (let i = 0; i < 4; i++) s += notehead(xs[i], true) + stem(ss[i]);
+        s += beamElement(ss[0] - 1, ss[3] + 1, stemTop);
+        s += beamElement(ss[0] - 1, ss[3] + 1, stemTop + beamH + beamGap);
         return s;
       }
 
-      // ── Eighth + two sixteenths ──
       case 'eighth-sixteenth': {
-        // 8th at 0-0.5, 16th at 0.5-0.75, 16th at 0.75-1.0
-        const xs = [noteX(0), noteX(0.5), noteX(0.75)];
-        const stemXs = xs.map(x => x + 4.5);
+        // 8th at 0, 16th at 0.5, 16th at 0.75
+        const xs = [nxf(0), nxf(0.5), nxf(0.75)];
+        const ss = xs.map(x => x + noteRx);
         let s = '';
-        for (let i = 0; i < 3; i++) {
-          s += notehead(xs[i], cy, true) + stem(stemXs[i], cy, stemTop);
-        }
+        for (let i = 0; i < 3; i++) s += notehead(xs[i], true) + stem(ss[i]);
         // Single beam over all three
-        s += beam(stemXs[0] - 1, stemXs[2] + 1, stemTop, beamH);
-        // Double beam over last two (16ths): starts at the 8th note stem
-        s += beam(stemXs[1] - 1, stemXs[2] + 1, stemTop + beamH + beamGap, beamH);
+        s += beamElement(ss[0] - 1, ss[2] + 1, stemTop);
+        // Secondary beam over last two (16ths)
+        s += beamElement(ss[1] - 1, ss[2] + 1, stemTop + beamH + beamGap);
         return s;
       }
 
-      // ── Two sixteenths + eighth ──
       case 'sixteenth-eighth': {
-        // 16th at 0-0.25, 16th at 0.25-0.5, 8th at 0.5-1.0
-        const xs = [noteX(0), noteX(0.25), noteX(0.5)];
-        const stemXs = xs.map(x => x + 4.5);
+        // 16th at 0, 16th at 0.25, 8th at 0.5
+        const xs = [nxf(0), nxf(0.25), nxf(0.5)];
+        const ss = xs.map(x => x + noteRx);
         let s = '';
-        for (let i = 0; i < 3; i++) {
-          s += notehead(xs[i], cy, true) + stem(stemXs[i], cy, stemTop);
-        }
+        for (let i = 0; i < 3; i++) s += notehead(xs[i], true) + stem(ss[i]);
+        s += beamElement(ss[0] - 1, ss[2] + 1, stemTop);
+        s += beamElement(ss[0] - 1, ss[1] + 1, stemTop + beamH + beamGap);
+        return s;
+      }
+
+      case 'sixteenth-eighth-sixteenth': {
+        // 16th at 0, 8th at 0.25, 16th at 0.75
+        const xs = [nxf(0), nxf(0.25), nxf(0.75)];
+        const ss = xs.map(x => x + noteRx);
+        let s = '';
+        for (let i = 0; i < 3; i++) s += notehead(xs[i], true) + stem(ss[i]);
         // Single beam over all three
-        s += beam(stemXs[0] - 1, stemXs[2] + 1, stemTop, beamH);
-        // Double beam over first two (16ths): runs from stem 0 to stem 1
-        s += beam(stemXs[0] - 1, stemXs[1] + 1, stemTop + beamH + beamGap, beamH);
+        s += beamElement(ss[0] - 1, ss[2] + 1, stemTop);
+        // Secondary beam over first note (16th)
+        s += beamElement(ss[0] - 1, ss[0] + 1, stemTop + beamH + beamGap);
+        // Secondary beam over last note (16th) — separate from first
+        s += beamElement(ss[2] - 1, ss[2] + 1, stemTop + beamH + beamGap);
         return s;
       }
 
-      // ── Eighth rest + eighth note ──
       case 'eighth-rest-note': {
-        const xn = noteX(0.5);
-        const stemX = xn + 4.5;
-        // Eighth rest at left, eighth note at right with flag
-        let s = `<text x="${noteX(0.25)}" y="${cy + 8}" text-anchor="middle" font-size="20" fill="currentColor">𝄿</text>`;
-        s += notehead(xn, cy, true) + stem(stemX, cy, stemTop) + flag(stemX, stemTop);
-        return s;
+        // Rest at 0-0.5, 8th note at 0.5-1.0
+        const xn = nxf(0.5);
+        const sn = xn + noteRx;
+        return restEighth(nxf(0.15)) + notehead(xn, true) + stem(sn) + flag(sn);
       }
 
-      // ── Eighth note + eighth rest ──
       case 'eighth-note-rest': {
-        const xn = noteX(0);
-        const stemX = xn + 4.5;
-        // Eighth note at left with flag, eighth rest at right
-        let s = notehead(xn, cy, true) + stem(stemX, cy, stemTop) + flag(stemX, stemTop);
-        s += `<text x="${noteX(0.75)}" y="${cy + 8}" text-anchor="middle" font-size="20" fill="currentColor">𝄿</text>`;
-        return s;
+        // 8th note at 0-0.5, rest at 0.5-1.0
+        const xn = nxf(0);
+        const sn = xn + noteRx;
+        return notehead(xn, true) + stem(sn) + flag(sn) + restEighth(nxf(0.85));
       }
 
-      // ── Quarter rest ──
       case 'quarter-rest':
-        return `<text x="50" y="${cy + 10}" text-anchor="middle" font-size="28" fill="currentColor">𝄽</text>`;
+        return restQuarter();
 
       default:
-        return notehead(50, cy, true) + stem(54.5, cy, stemTop);
+        return notehead(nxf(0.5), true) + stem(nxf(0.5) + noteRx);
     }
   })()}
 </svg>
 
 <style>
   .notation {
-    width: 100%;
-    height: auto;
     display: block;
+    width: auto;
+    height: 36px;
+    max-width: 100%;
     color: var(--text);
   }
 </style>
