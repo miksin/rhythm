@@ -131,3 +131,24 @@ export function getPatternsForDifficulty(difficulty: Difficulty): RhythmPattern[
   const maxRank = DIFFICULTY_RANK[difficulty];
   return PATTERNS.filter((p) => DIFFICULTY_RANK[p.difficulty] <= maxRank);
 }
+
+export function generateGrid(difficulty: Difficulty): Row[] {
+  const candidates = getPatternsForDifficulty(difficulty);
+  const rows: Row[] = [];
+
+  for (let r = 0; r < 4; r++) {
+    const row: PlacedPattern[] = [];
+    let remaining = 4;
+
+    while (remaining > 0) {
+      const valid = candidates.filter((p) => p.duration <= remaining);
+      const picked = valid[Math.floor(Math.random() * valid.length)];
+      row.push({ pattern: picked, col: 4 - remaining, span: picked.duration });
+      remaining -= picked.duration;
+    }
+
+    rows.push(row);
+  }
+
+  return rows;
+}
