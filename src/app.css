@@ -329,6 +329,56 @@ h1 {
 .cell.poor    { border-color: #E57373; background: #FFEBEE; }
 .cell.missed  { border-color: #CFD8DC; background: #F5F5F5; opacity: 0.6; }
 
+/* Mode toggle */
+.mode-toggle {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.mode-btn {
+  background: var(--control-bg);
+  color: var(--text);
+  border: none;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.mode-btn.active {
+  background: var(--btn-primary);
+  color: var(--btn-primary-text);
+  font-weight: 600;
+}
+
+.mode-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Stop button */
+.stop-btn {
+  background: var(--text-muted);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 24px;
+  font-size: 14px;
+  font-family: var(--font);
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: opacity 0.15s;
+}
+
+.stop-btn:hover {
+  opacity: 0.85;
+}
+
 /* Disabled controls */
 .controls select:disabled,
 .controls button:disabled,
