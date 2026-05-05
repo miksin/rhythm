@@ -183,9 +183,9 @@ h1 {
   transform: scale(1.03);
 }
 
-.cell .symbol {
-  font-size: 52px;
-  line-height: 1;
+.cell :global(.notation) {
+  max-width: 100%;
+  height: auto;
 }
 
 .cell .label {

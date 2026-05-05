@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Row } from './rhythm';
   import type { BeatResult } from './scoring';
+  import Notation from './Notation.svelte';
 
   type Phase = 'idle' | 'countdown' | 'playing' | 'finished';
 
@@ -59,7 +60,7 @@
           class:active={isActiveCell(ri, placed.col, placed.span)}
           style="grid-column: span {placed.span}"
         >
-          <span class="symbol">{placed.pattern.symbol}</span>
+          <Notation pattern={placed.pattern} />
           <span class="label">{placed.pattern.label}</span>
         </div>
       {/each}
