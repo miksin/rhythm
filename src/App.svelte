@@ -1,89 +1,97 @@
-<script>
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from './assets/vite.svg'
-  import heroImg from './assets/hero.png'
-  import Counter from './lib/Counter.svelte'
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import RhythmGrid from './lib/RhythmGrid.svelte';
+  import { generateGrid, type Difficulty, type Row } from './lib/rhythm';
+  import { initAudio, setMuted, playSubdivisions, playClick } from './lib/audio';
+
+  let difficulty: Difficulty = $state('intermediate');
+  let bpm: number = $state(60);
+  let rows: Row[] = $state([]);
+  let currentBeat: number = $state(0);
+  let isMuted: boolean = $state(false);
+
+  function newGrid(): void {
+    rows = generateGrid(difficulty);
+    currentBeat = 0;
+  }
+
+  function advanceBeat(): void {
+    initAudio();
+    const flatIndex = currentBeat;
+    const r = Math.floor(flatIndex / 4);
+    const c = flatIndex % 4;
+    const row = rows[r];
+    if (!row) return;
+
+    const placed = row.find((p) => c >= p.col && c < p.col + p.span);
+    if (placed) {
+      const offsetInPattern = c - placed.col;
+      const subdivisions = placed.pattern.subdivisions.map((s) => s - offsetInPattern).filter((s) => s >= 0 && s < 1);
+      playSubdivisions(subdivisions, bpm);
+    } else {
+      playClick();
+    }
+
+    currentBeat = (currentBeat + 1) % 16;
+  }
+
+  function handleKeydown(e: KeyboardEvent): void {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      advanceBeat();
+    }
+  }
+
+  function handleDifficultyChange(e: Event): void {
+    difficulty = (e.target as HTMLSelectElement).value as Difficulty;
+    newGrid();
+  }
+
+  function toggleMute(): void {
+    isMuted = !isMuted;
+    setMuted(isMuted);
+  }
+
+  onMount(() => {
+    newGrid();
+    initAudio();
+    window.addEventListener('keydown', handleKeydown);
+    return () => window.removeEventListener('keydown', handleKeydown);
+  });
 </script>
 
-<section id="center">
-  <div class="hero">
-    <img src={heroImg} class="base" width="170" height="179" alt="" />
-    <img src={svelteLogo} class="framework" alt="Svelte logo" />
-    <img src={viteLogo} class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/App.svelte</code> and save to test <code>HMR</code></p>
-  </div>
-  <Counter />
-</section>
+<h1>Rhythm Practice</h1>
 
-<div class="ticks"></div>
+<div class="controls">
+  <select value={difficulty} onchange={handleDifficultyChange}>
+    <option value="basic">Basic</option>
+    <option value="intermediate">Intermediate</option>
+    <option value="advanced">Advanced</option>
+    <option value="all">All</option>
+  </select>
+  <button class="primary" onclick={newGrid}>Generate</button>
+  <button class="mute-btn" onclick={toggleMute} title={isMuted ? 'Unmute' : 'Mute'}>
+    {isMuted ? '🔇' : '🔊'}
+  </button>
+</div>
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#documentation-icon"></use>
-    </svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank" rel="noreferrer">
-          <img class="logo" src={viteLogo} alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://svelte.dev/" target="_blank" rel="noreferrer">
-          <img class="button-icon" src={svelteLogo} alt="" />
-          Learn more
-        </a>
-      </li>
-    </ul>
+<div class="bpm-section">
+  <div class="bpm-display">♩ = {bpm}</div>
+  <div class="bpm-slider">
+    <span>40</span>
+    <input
+      type="range"
+      min="40"
+      max="200"
+      bind:value={bpm}
+    />
+    <span>200</span>
   </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#social-icon"></use>
-    </svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li>
-        <a href="https://github.com/vitejs/vite" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#github-icon"></use>
-          </svg>
-          GitHub
-        </a>
-      </li>
-      <li>
-        <a href="https://chat.vite.dev/" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#discord-icon"></use>
-          </svg>
-          Discord
-        </a>
-      </li>
-      <li>
-        <a href="https://x.com/vite_js" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#x-icon"></use>
-          </svg>
-          X.com
-        </a>
-      </li>
-      <li>
-        <a href="https://bsky.app/profile/vite.dev" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#bluesky-icon"></use>
-          </svg>
-          Bluesky
-        </a>
-      </li>
-    </ul>
-  </div>
-</section>
+</div>
 
-<div class="ticks"></div>
-<section id="spacer"></section>
+<RhythmGrid {rows} {currentBeat} onAdvance={advanceBeat} />
+
+<div class="progress">
+  <div class="beat-indicator">Beat {currentBeat + 1} / 16</div>
+  <div class="hint">Press Space or tap the grid to advance</div>
+</div>
