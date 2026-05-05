@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import RhythmGrid from './lib/RhythmGrid.svelte';
   import { generateGrid, type Difficulty, type Row } from './lib/rhythm';
-  import { initAudio, setMuted, playCountdownTick, playMetronomeTick, playBeatSounds } from './lib/audio';
+  import { initAudio, setMuted, playCountdownTick, playMetronomeTick } from './lib/audio';
   import { calculateResults, type BeatResult } from './lib/scoring';
 
   type Phase = 'idle' | 'countdown' | 'playing' | 'finished';
@@ -67,30 +67,52 @@
       }
       const beat = slot - 4;
       currentBeat = beat;
-      const r = Math.floor(beat / 4);
-      const c = beat % 4;
-      const row = rows[r];
-      if (!row) return;
-
-      const placed = row.find((p) => c >= p.col && c < p.col + p.span);
-      if (placed) {
-        const offsetInPattern = c - placed.col;
-        const subdivisions = placed.pattern.subdivisions
-          .map((s) => s - offsetInPattern)
-          .filter((s) => s >= 0 && s < 1);
-        playBeatSounds(subdivisions, bpm);
-      } else {
-        playMetronomeTick(bpm);
-      }
+      playMetronomeTick(bpm);
     }
+  }
+
+  function isRestBeat(beat: number): boolean {
+    const r = Math.floor(beat / 4);
+    const c = beat % 4;
+    const row = rows[r];
+    if (!row) return false;
+    const placed = row.find((p) => c >= p.col && c < p.col + p.span);
+    return placed?.pattern.category === 'rest';
   }
 
   function finishSession(): void {
     const beatMs = (60 / bpm) * 1000;
     const toleranceMs = Math.min(beatMs * 500, 300);
     const playingExpected = expectedWallTimes.slice(4);
-    const results = calculateResults(playingExpected, tapTimestamps, toleranceMs);
-    beatResults = results.beatResults;
+
+    const activeIndices: number[] = [];
+    for (let beat = 0; beat < 16; beat++) {
+      if (!isRestBeat(beat)) {
+        activeIndices.push(beat);
+      }
+    }
+
+    const activeExpected = activeIndices.map((i) => playingExpected[i]);
+    const results = calculateResults(activeExpected, tapTimestamps, toleranceMs);
+
+    const fullResults: BeatResult[] = [];
+    let resultIdx = 0;
+    for (let beat = 0; beat < 16; beat++) {
+      if (isRestBeat(beat)) {
+        fullResults.push({
+          beatIndex: beat,
+          expectedTime: playingExpected[beat],
+          tapTime: null,
+          deviationMs: null,
+          accuracy: -1,
+        });
+      } else {
+        fullResults.push(results.beatResults[resultIdx]);
+        resultIdx++;
+      }
+    }
+
+    beatResults = fullResults;
     phase = 'finished';
   }
 
@@ -199,15 +221,20 @@
     <div class="beat-indicator">Beat {currentBeat + 1} / 16</div>
     <div class="hint">Tap Space or click the grid</div>
   {:else if phase === 'finished'}
-    {@const hitCount = beatResults?.filter(r => r.tapTime !== null).length ?? 0}
-    {@const totalBeats = beatResults?.length ?? 16}
-    {@const overallPct = beatResults && beatResults.length > 0
-      ? Math.round(beatResults.reduce((s, r) => s + r.accuracy, 0) / beatResults.length * 100)
+    {@const activeResults = beatResults?.filter(r => r.accuracy >= 0) ?? []}
+    {@const hitCount = activeResults.filter(r => r.tapTime !== null).length}
+    {@const totalActive = activeResults.length}
+    {@const overallPct = totalActive > 0
+      ? Math.round(activeResults.reduce((s, r) => s + r.accuracy, 0) / totalActive * 100)
       : 0}
+    {@const restCount = (beatResults?.length ?? 0) - totalActive}
     <div class="results-accuracy">{overallPct}%</div>
     <div class="results-label">Accuracy</div>
     <div class="results-stats">
-      <span>Hits: {hitCount}/{totalBeats}</span>
+      <span>Hits: {hitCount}/{totalActive}</span>
+      {#if restCount > 0}
+        <span>Rests: {restCount}</span>
+      {/if}
     </div>
     <div class="results-actions">
       <button class="primary" onclick={restart}>Practice Again</button>

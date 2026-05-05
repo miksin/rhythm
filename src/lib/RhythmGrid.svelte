@@ -27,7 +27,7 @@
   }
 
   function accuracyClass(acc: number | null): string {
-    if (acc === null) return '';
+    if (acc === null || acc < 0) return '';
     if (acc >= 0.9) return 'perfect';
     if (acc >= 0.7) return 'good';
     if (acc >= 0.4) return 'okay';
