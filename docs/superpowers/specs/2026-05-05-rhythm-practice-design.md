@@ -12,7 +12,7 @@ A rhythm practice web app built with Svelte 5 + Vite + TypeScript. Displays a 4�
 - **Random rhythm generation**: Fills all 16 beats with patterns matching the selected difficulty
 - **Variable-duration notes**: Patterns occupy 1–4 consecutive cells per row. Notes do not cross measure (row) boundaries
 - **Difficulty selector**: Four levels — Basic, Intermediate, Advanced, All
-- **BPM control**: Slider from 40–200 BPM, default 100
+- **BPM control**: Slider from 40–200 BPM, default 60
 - **Tap-along interaction**: Press Spacebar or tap screen to advance through beats. Current beat highlights
 - **Audio playback**: Web Audio API plays note sounds on each beat advance. Mute toggle available
 
@@ -161,7 +161,7 @@ interface Cell {
 
 ## Interaction Design
 
-1. **On load**: Generate a random rhythm at default difficulty (Intermediate), BPM 100
+1. **On load**: Generate a random rhythm at default difficulty (Intermediate), BPM 60
 2. **Generate button**: New random rhythm, resets currentBeat to 0
 3. **Difficulty change**: Auto-regenerates grid
 4. **BPM slider**: Updates in real-time, affects audio playback timing
