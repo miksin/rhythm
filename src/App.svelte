@@ -62,6 +62,9 @@
       currentCount = 4 - slot;
       playCountdownTick();
     } else {
+      if (phase === 'countdown') {
+        phase = 'playing';
+      }
       const beat = slot - 4;
       currentBeat = beat;
       const r = Math.floor(beat / 4);
