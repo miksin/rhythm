@@ -32,7 +32,7 @@
   function startSession(): void {
     initAudio();
     const beatMs = (60 / bpm) * 1000;
-    const sessionStart = performance.now();
+    const sessionStart = performance.now() + beatMs;
     expectedWallTimes = Array.from({ length: 20 }, (_, i) => sessionStart + i * beatMs);
     tapTimestamps = [];
     processingCursor = 0;
@@ -52,8 +52,11 @@
       processingCursor++;
     }
     if (processingCursor >= 20) {
-      stopScheduler();
-      finishSession();
+      const graceEnd = expectedWallTimes[19] + (60 / bpm) * 1000;
+      if (now >= graceEnd) {
+        stopScheduler();
+        finishSession();
+      }
     }
   }
 
