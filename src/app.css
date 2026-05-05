@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Bravura';
+  src: url('https://cdn.jsdelivr.net/npm/@vexflow-fonts/bravura@1.0.2/bravura.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
 :root {
   --bg: #F8F5F0;
   --text: #5D5A6D;
@@ -181,11 +189,6 @@ h1 {
 .cell.active {
   background: var(--active-bg);
   transform: scale(1.03);
-}
-
-.cell .label {
-  font-size: 11px;
-  color: var(--text-muted);
 }
 
 .progress {

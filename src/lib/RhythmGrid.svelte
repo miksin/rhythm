@@ -61,7 +61,6 @@
           style="grid-column: span {placed.span}"
         >
           <Notation pattern={placed.pattern} />
-          <span class="label">{placed.pattern.label}</span>
         </div>
       {/each}
     </div>
