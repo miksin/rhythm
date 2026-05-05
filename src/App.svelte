@@ -3,12 +3,17 @@
   import RhythmGrid from './lib/RhythmGrid.svelte';
   import { generateGrid, type Difficulty, type Row } from './lib/rhythm';
   import { initAudio, setMuted, playSubdivisions, playClick } from './lib/audio';
+  import type { BeatResult } from './lib/scoring';
+
+  type Phase = 'idle' | 'countdown' | 'playing' | 'finished';
 
   let difficulty: Difficulty = $state('intermediate');
   let bpm: number = $state(60);
   let rows: Row[] = $state([]);
   let currentBeat: number = $state(0);
   let isMuted: boolean = $state(false);
+  let phase: Phase = $state('playing');
+  let beatResults: BeatResult[] | null = $state(null);
 
   function newGrid(): void {
     rows = generateGrid(difficulty);
@@ -89,7 +94,7 @@
   </div>
 </div>
 
-<RhythmGrid {rows} {currentBeat} onAdvance={advanceBeat} />
+<RhythmGrid {rows} {currentBeat} {phase} {beatResults} onTap={advanceBeat} />
 
 <div class="progress">
   <div class="beat-indicator">Beat {currentBeat + 1} / 16</div>
