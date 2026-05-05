@@ -53,13 +53,36 @@ Each `Beat` array must sum to exactly 1 beat. The generator enforces this constr
 
 Three levels selectable via UI buttons. Switching regenerates the full sheet.
 
-| Level | Available Beat Patterns |
-|-------|------------------------|
-| **Basic** | `['1/4']`, `['1/8','1/8']`, `['rest-1/4']`, `['1/8','rest-1/8']` |
-| **Intermediate** | Basic + `['1/16','1/16','1/16','1/16']`, `['1/8-dot','1/16']`, `['1/8','1/16','1/16']`, `['1/16','1/16','1/8']`, `['rest-1/16','1/16','1/8']`, `['rest-1/8','1/8']` |
-| **Advanced** | Intermediate + `['triplet-1/8','triplet-1/8','triplet-1/8']`, `['1/16','rest-1/16','1/8']`, `['rest-1/16','1/16','1/16','1/16']`, `['1/16','1/16','rest-1/16','1/16']` |
+**Principle:** The pattern library includes **all unique permutations** of each note combination. For example, the combination {1/8, 1/16, 1/16} yields three patterns: `[1/8,1/16,1/16]`, `[1/16,1/8,1/16]`, `[1/16,1/16,1/8]`.
 
-Note: `1/4-dot` (= 1.5 beats) cannot fill a single beat cell alone. Dotted notes are valid within a beat only when combined appropriately (e.g., `['1/8-dot', '1/16']` = 0.75 + 0.25 = 1 beat).
+### Basic
+
+| Combination | Permutations |
+|-------------|-------------|
+| {1/4} | `['1/4']` |
+| {1/8, 1/8} | `['1/8','1/8']` |
+| {rest-1/4} | `['rest-1/4']` |
+| {1/8, rest-1/8} | `['1/8','rest-1/8']`, `['rest-1/8','1/8']` |
+
+### Intermediate (includes all Basic patterns, plus:)
+
+| Combination | Permutations |
+|-------------|-------------|
+| {1/16×4} | `['1/16','1/16','1/16','1/16']` |
+| {1/8-dot, 1/16} | `['1/8-dot','1/16']`, `['1/16','1/8-dot']` |
+| {1/8, 1/16, 1/16} | `['1/8','1/16','1/16']`, `['1/16','1/8','1/16']`, `['1/16','1/16','1/8']` |
+| {rest-1/8, 1/8} | `['rest-1/8','1/8']` *(`['1/8','rest-1/8']` already in Basic)* |
+| {rest-1/16, 1/16, 1/16, 1/16} | `['rest-1/16','1/16','1/16','1/16']`, `['1/16','rest-1/16','1/16','1/16']`, `['1/16','1/16','rest-1/16','1/16']`, `['1/16','1/16','1/16','rest-1/16']` |
+
+### Advanced (includes all Intermediate patterns, plus:)
+
+| Combination | Permutations |
+|-------------|-------------|
+| {triplet-1/8 × 3} | `['triplet-1/8','triplet-1/8','triplet-1/8']` |
+| {rest-1/16, 1/16, 1/8} | `['rest-1/16','1/16','1/8']`, `['rest-1/16','1/8','1/16']`, `['1/16','rest-1/16','1/8']`, `['1/16','1/8','rest-1/16']`, `['1/8','rest-1/16','1/16']`, `['1/8','1/16','rest-1/16']` |
+| {rest-1/8-dot, 1/16} | `['rest-1/8-dot','1/16']`, `['1/16','rest-1/8-dot']` |
+
+Note: `1/4-dot` (= 1.5 beats) cannot fill a single beat cell alone. Dotted notes are valid within a beat only when combined appropriately (e.g., `['1/8-dot','1/16']` = 0.75 + 0.25 = 1 beat).
 
 ---
 
