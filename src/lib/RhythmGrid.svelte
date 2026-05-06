@@ -12,35 +12,30 @@
 </script>
 
 <div class="grid">
-  {#each sheet as measure, measureIdx}
-    <div class="measure-row">
-      {#each measure as beat, beatIdx}
-        {@const flatIdx = measureIdx * 4 + beatIdx}
-        <div class="cell-wrap">
-          <BeatCell {beat} state={cellStates[flatIdx]} />
-        </div>
-      {/each}
+  {#each sheet.flat() as beat, i}
+    <div class="cell-wrap">
+      <BeatCell {beat} state={cellStates[i]} />
     </div>
   {/each}
 </div>
 
 <style>
   .grid {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 4px;
-    width: min(85vw, 85vh, 600px);
-    aspect-ratio: 1;
+    width: min(90vw, 600px);
   }
 
-  .measure-row {
-    display: flex;
-    flex: 1;
-    gap: 4px;
+  /* Mobile: 2 columns × 8 rows */
+  @media (max-width: 500px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 
   .cell-wrap {
-    flex: 1;
+    aspect-ratio: 13 / 9;
     min-width: 0;
     min-height: 0;
   }

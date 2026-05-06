@@ -9,14 +9,16 @@ test('renders 16 beat cells', async ({ page }) => {
   await expect(cells).toHaveCount(16)
 })
 
-test('each cell is square', async ({ page }) => {
+test('each cell has 13:9 landscape aspect ratio', async ({ page }) => {
   const cells = page.locator('.cell')
   const count = await cells.count()
   for (let i = 0; i < count; i++) {
     const box = await cells.nth(i).boundingBox()
     expect(box).not.toBeNull()
-    // Allow 2px tolerance for rounding
-    expect(Math.abs(box!.width - box!.height)).toBeLessThanOrEqual(2)
+    const ratio = box!.width / box!.height
+    // 13/9 ≈ 1.444 — allow ±5% tolerance for rounding
+    expect(ratio).toBeGreaterThan(1.44 * 0.95)
+    expect(ratio).toBeLessThan(1.44 * 1.05)
   }
 })
 

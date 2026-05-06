@@ -87,9 +87,16 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 28px;
-    padding: 32px 16px;
+    gap: 20px;
+    padding: 24px 6px;
     min-height: 100vh;
+  }
+
+  @media (min-width: 500px) {
+    main {
+      gap: 28px;
+      padding: 32px 16px;
+    }
   }
 
   h1 {
