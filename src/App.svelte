@@ -1,89 +1,101 @@
-<script>
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from './assets/vite.svg'
-  import heroImg from './assets/hero.png'
-  import Counter from './lib/Counter.svelte'
+<!-- src/App.svelte -->
+<script lang="ts">
+  import { Metronome } from './lib/metronome'
+  import { generateSheet, generateHalf } from './lib/rhythmGenerator'
+  import RhythmGrid from './lib/RhythmGrid.svelte'
+  import Controls from './lib/Controls.svelte'
+  import type { Difficulty, RhythmSheet, CellState } from './lib/types'
+
+  let difficulty = $state<Difficulty>('basic')
+  let bpm = $state(80)
+  let isPlaying = $state(false)
+  let sheet = $state<RhythmSheet>(generateSheet('basic'))
+  let cellStates = $state<CellState[]>(Array(16).fill('upcoming') as CellState[])
+  let currentBeat = $state(-1)
+  let playCount = $state(0)
+
+  const metronome = new Metronome()
+
+  function handleBeat(beat: number): void {
+    // Dim previous cell, highlight current
+    if (currentBeat >= 0) cellStates[currentBeat] = 'played'
+    cellStates[beat] = 'active'
+    currentBeat = beat
+
+    // Double-buffer: beat=0 → loop started; beat=8 → halfway
+    if (beat === 0) {
+      playCount++
+      if (playCount > 1) {
+        // Back half (8-15) just finished → regenerate it
+        const [m2, m3] = generateHalf(difficulty)
+        sheet = [sheet[0], sheet[1], m2, m3]
+        for (let i = 8; i < 16; i++) cellStates[i] = 'upcoming'
+      }
+    }
+
+    if (beat === 8) {
+      // Front half (0-7) just finished → regenerate it
+      const [m0, m1] = generateHalf(difficulty)
+      sheet = [m0, m1, sheet[2], sheet[3]]
+      for (let i = 0; i < 8; i++) cellStates[i] = 'upcoming'
+    }
+  }
+
+  function play(): void {
+    isPlaying = true
+    playCount = 0
+    currentBeat = -1
+    cellStates = Array(16).fill('upcoming') as CellState[]
+    metronome.bpm = bpm
+    metronome.start(bpm, handleBeat)
+  }
+
+  function stop(): void {
+    isPlaying = false
+    currentBeat = -1
+    cellStates = Array(16).fill('upcoming') as CellState[]
+    metronome.stop()
+  }
+
+  function handleBpmChange(newBpm: number): void {
+    bpm = newBpm
+    metronome.bpm = newBpm
+  }
+
+  function handleDifficultyChange(d: Difficulty): void {
+    difficulty = d
+    sheet = generateSheet(d)
+  }
 </script>
 
-<section id="center">
-  <div class="hero">
-    <img src={heroImg} class="base" width="170" height="179" alt="" />
-    <img src={svelteLogo} class="framework" alt="Svelte logo" />
-    <img src={viteLogo} class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/App.svelte</code> and save to test <code>HMR</code></p>
-  </div>
-  <Counter />
-</section>
+<main>
+  <h1>節奏練習</h1>
+  <Controls
+    {bpm}
+    {difficulty}
+    {isPlaying}
+    onBpmChange={handleBpmChange}
+    onDifficultyChange={handleDifficultyChange}
+    onPlay={play}
+    onStop={stop}
+  />
+  <RhythmGrid {sheet} {cellStates} />
+</main>
 
-<div class="ticks"></div>
+<style>
+  main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    padding: 32px 16px;
+    min-height: 100vh;
+  }
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#documentation-icon"></use>
-    </svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank" rel="noreferrer">
-          <img class="logo" src={viteLogo} alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://svelte.dev/" target="_blank" rel="noreferrer">
-          <img class="button-icon" src={svelteLogo} alt="" />
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#social-icon"></use>
-    </svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li>
-        <a href="https://github.com/vitejs/vite" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#github-icon"></use>
-          </svg>
-          GitHub
-        </a>
-      </li>
-      <li>
-        <a href="https://chat.vite.dev/" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#discord-icon"></use>
-          </svg>
-          Discord
-        </a>
-      </li>
-      <li>
-        <a href="https://x.com/vite_js" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#x-icon"></use>
-          </svg>
-          X.com
-        </a>
-      </li>
-      <li>
-        <a href="https://bsky.app/profile/vite.dev" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#bluesky-icon"></use>
-          </svg>
-          Bluesky
-        </a>
-      </li>
-    </ul>
-  </div>
-</section>
-
-<div class="ticks"></div>
-<section id="spacer"></section>
+  h1 {
+    font-size: 1.6rem;
+    letter-spacing: 0.08em;
+    color: #d0d0f0;
+    margin: 0;
+  }
+</style>
