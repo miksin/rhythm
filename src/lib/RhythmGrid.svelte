@@ -36,11 +36,12 @@
   .measure-row {
     display: flex;
     flex: 1;
-    gap: 6px;
+    gap: 8px;
   }
 
   .cell-wrap {
     flex: 1;
     min-width: 0;
+    min-height: 0;
   }
 </style>
