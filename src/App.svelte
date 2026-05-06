@@ -6,10 +6,10 @@
   import Controls from './lib/Controls.svelte'
   import type { Difficulty, RhythmSheet, CellState } from './lib/types'
 
-  let difficulty = $state<Difficulty>('basic')
+  let difficulty = $state<Difficulty>('intermediate')
   let bpm = $state(60)
   let isPlaying = $state(false)
-  let sheet = $state<RhythmSheet>(generateSheet('basic'))
+  let sheet = $state<RhythmSheet>(generateSheet('intermediate'))
   let cellStates = $state<CellState[]>(Array(16).fill('upcoming') as CellState[])
   let currentBeat = $state(-1)
   let playCount = $state(0)
