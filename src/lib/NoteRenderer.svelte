@@ -26,8 +26,9 @@
 
   function render(el: HTMLDivElement, beat: Beat) {
     el.replaceChildren()
-    const W = el.clientWidth || 120
-    const H = el.clientHeight || 120
+    const W = el.clientWidth
+    const H = el.clientHeight
+    if (W === 0 || H === 0) return
 
     const renderer = new Renderer(el, Renderer.Backends.SVG)
     renderer.resize(W, H)
@@ -70,7 +71,15 @@
   }
 
   $effect(() => {
-    if (container) render(container, beat)
+    const currentBeat = beat
+    if (!container) return
+    const el = container
+
+    render(el, currentBeat)
+
+    const ro = new ResizeObserver(() => render(el, currentBeat))
+    ro.observe(el)
+    return () => ro.disconnect()
   })
 </script>
 
