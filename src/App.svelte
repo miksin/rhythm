@@ -7,7 +7,7 @@
   import type { Difficulty, RhythmSheet, CellState } from './lib/types'
 
   let difficulty = $state<Difficulty>('basic')
-  let bpm = $state(80)
+  let bpm = $state(60)
   let isPlaying = $state(false)
   let sheet = $state<RhythmSheet>(generateSheet('basic'))
   let cellStates = $state<CellState[]>(Array(16).fill('upcoming') as CellState[])

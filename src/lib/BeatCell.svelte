@@ -14,22 +14,18 @@
 <style>
   .cell {
     aspect-ratio: 1;
-    border: 1.5px solid #c8b89a;
+    border: 2px solid transparent;
     border-radius: 4px;
-    outline: 2px solid transparent;
-    outline-offset: -2px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 6px;
     box-sizing: border-box;
-    background: #faf6ee;
-    box-shadow: 0 1px 4px rgba(80, 50, 20, 0.08);
-    transition: opacity 0.15s, background 0.1s, outline-color 0.1s;
+    transition: opacity 0.15s, background 0.1s, border-color 0.1s;
   }
 
   .cell.active {
-    outline: 2px solid #b07030;
+    border-color: #b07030;
     background: #fff3dc;
   }
 
