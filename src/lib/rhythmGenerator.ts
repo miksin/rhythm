@@ -1,29 +1,21 @@
 import type { Beat, Measure, RhythmSheet, Difficulty } from './types'
-import { PATTERNS } from './rhythmPatterns'
+import { PATTERNS, THEMES } from './rhythmPatterns'
 
-function randomBeat(difficulty: Difficulty): Beat {
-  const patterns = PATTERNS[difficulty]
-  return patterns[Math.floor(Math.random() * patterns.length)]
+function pick<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)]
 }
 
-function generateMeasure(difficulty: Difficulty): Measure {
-  return [
-    randomBeat(difficulty),
-    randomBeat(difficulty),
-    randomBeat(difficulty),
-    randomBeat(difficulty),
-  ]
+function generateMeasure(patterns: Beat[]): Measure {
+  return [pick(patterns), pick(patterns), pick(patterns), pick(patterns)]
 }
 
 export function generateHalf(difficulty: Difficulty): [Measure, Measure] {
-  return [generateMeasure(difficulty), generateMeasure(difficulty)]
+  const theme = pick(THEMES[difficulty])
+  return [generateMeasure(theme.patterns), generateMeasure(theme.patterns)]
 }
 
 export function generateSheet(difficulty: Difficulty): RhythmSheet {
-  return [
-    generateMeasure(difficulty),
-    generateMeasure(difficulty),
-    generateMeasure(difficulty),
-    generateMeasure(difficulty),
-  ]
+  const [m0, m1] = generateHalf(difficulty)
+  const [m2, m3] = generateHalf(difficulty)
+  return [m0, m1, m2, m3]
 }
