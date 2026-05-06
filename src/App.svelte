@@ -87,6 +87,11 @@
     onStop={stop}
   />
   <RhythmGrid {sheet} {cellStates} />
+  <footer>
+    <a href="https://github.com/miksin/rhythm" target="_blank" rel="noopener noreferrer">
+      miksin/rhythm
+    </a>
+  </footer>
 </main>
 
 <style>
@@ -112,5 +117,23 @@
     color: #4a3520;
     margin: 0;
     font-weight: normal;
+  }
+
+  footer {
+    margin-top: auto;
+    padding-top: 8px;
+  }
+
+  footer a {
+    font-size: 0.75rem;
+    color: #9a7a55;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+  }
+
+  footer a:hover {
+    opacity: 1;
   }
 </style>
