@@ -1,64 +1,87 @@
 <!-- src/lib/NoteRenderer.svelte -->
 <script lang="ts">
-  import type { Beat } from './types'
-  import { computeRenderItems, type RenderItem } from './noteGeometry'
+  import { Renderer, Stave, StaveNote, Voice, Formatter, Beam, Tuplet } from 'vexflow'
+  import type { Beat, NoteValue } from './types'
 
   interface Props { beat: Beat }
   let { beat }: Props = $props()
 
-  let items = $derived(computeRenderItems(beat))
+  let container: HTMLDivElement | undefined = $state()
+
+  const DURATION_MAP: Record<NoteValue, string> = {
+    '1/4':          'q',
+    '1/8':          '8',
+    '1/16':         '16',
+    '1/8-dot':      '8d',
+    'rest-1/4':     'qr',
+    'rest-1/8':     '8r',
+    'rest-1/16':    '16r',
+    'rest-1/8-dot': '8dr',
+    'triplet-1/8':  '8',
+  }
+
+  function buildNotes(beat: Beat): StaveNote[] {
+    return beat.map(nv => new StaveNote({ keys: ['b/4'], duration: DURATION_MAP[nv] }))
+  }
+
+  function render(el: HTMLDivElement, beat: Beat) {
+    el.replaceChildren()
+    const W = el.clientWidth || 120
+    const H = el.clientHeight || 120
+
+    const renderer = new Renderer(el, Renderer.Backends.SVG)
+    renderer.resize(W, H)
+    const ctx = renderer.getContext()
+    ctx.setFillStyle('#3a2a15')
+    ctx.setStrokeStyle('#3a2a15')
+
+    const staveX = 5
+    const staveY = H * 0.1
+    const staveW = W - 10
+
+    const stave = new Stave(staveX, staveY, staveW)
+    stave.setContext(ctx).draw()
+
+    const notes = buildNotes(beat)
+
+    // Detect triplet group
+    const tripletIndices = beat.reduce<number[]>((acc, nv, i) =>
+      nv === 'triplet-1/8' ? [...acc, i] : acc, [])
+    const isTriplet = tripletIndices.length === 3
+
+    let beams: Beam[]
+    let tuplets: Tuplet[] = []
+
+    if (isTriplet) {
+      const tripletNotes = tripletIndices.map(i => notes[i])
+      beams = [new Beam(tripletNotes)]
+      tuplets = [new Tuplet(tripletNotes, { num_notes: 3, notes_occupied: 2 })]
+    } else {
+      beams = Beam.generateBeams(notes)
+    }
+
+    const voice = new Voice({ num_beats: 1, beat_value: 4 }).setStrict(false)
+    voice.addTickables(notes)
+    new Formatter().joinVoices([voice]).format([voice], staveW - 16)
+
+    voice.draw(ctx, stave)
+    beams.forEach(b => b.setContext(ctx).draw())
+    tuplets.forEach(t => t.setContext(ctx).draw())
+  }
+
+  $effect(() => {
+    if (container) render(container, beat)
+  })
 </script>
 
-<svg viewBox="0 0 80 80" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" overflow="visible">
-  {#each items as item (JSON.stringify(item))}
-    {#if item.kind === 'notehead'}
-      <ellipse cx={item.cx} cy={62} rx={6} ry={4.5} fill="black" />
-      {#if item.dotted}
-        <circle cx={item.cx + 11} cy={59} r={2.5} fill="black" />
-      {/if}
+<div bind:this={container} class="renderer"></div>
 
-    {:else if item.kind === 'stem'}
-      <line x1={item.cx + 5} y1={58} x2={item.cx + 5} y2={22}
-            stroke="black" stroke-width="1.5" />
-
-    {:else if item.kind === 'flag'}
-      <path d="M {item.cx + 5},22 C {item.cx + 20},30 {item.cx + 21},40 {item.cx + 9},50"
-            stroke="black" stroke-width="1.5" fill="none" stroke-linecap="round" />
-      {#if item.count === 2}
-        <path d="M {item.cx + 5},30 C {item.cx + 20},38 {item.cx + 21},48 {item.cx + 9},58"
-              stroke="black" stroke-width="1.5" fill="none" stroke-linecap="round" />
-      {/if}
-
-    {:else if item.kind === 'beam'}
-      <rect x={item.x1} y={item.beamIndex === 0 ? 22 : 28}
-            width={item.x2 - item.x1 + 1.5} height={3} fill="black" />
-
-    {:else if item.kind === 'rest-quarter'}
-      <path d="M {item.cx + 4},30 L {item.cx - 5},38
-               C {item.cx + 4},42 {item.cx + 5},46 {item.cx - 2},52
-               L {item.cx + 4},60"
-            stroke="black" stroke-width="2.5" stroke-linecap="round" fill="none" />
-
-    {:else if item.kind === 'rest-eighth'}
-      <circle cx={item.cx + 2} cy={35} r={4.5} fill="black" />
-      <line x1={item.cx + 5} y1={37} x2={item.cx - 4} y2={62}
-            stroke="black" stroke-width="2" stroke-linecap="round" />
-      {#if item.dotted}
-        <circle cx={item.cx + 12} cy={33} r={2.5} fill="black" />
-      {/if}
-
-    {:else if item.kind === 'rest-sixteenth'}
-      <circle cx={item.cx + 2} cy={30} r={3.5} fill="black" />
-      <circle cx={item.cx + 6} cy={44} r={3.5} fill="black" />
-      <line x1={item.cx + 5} y1={32} x2={item.cx - 4} y2={62}
-            stroke="black" stroke-width="1.8" stroke-linecap="round" />
-
-    {:else if item.kind === 'triplet-bracket'}
-      <line x1={item.x1} y1={16} x2={item.x1} y2={11} stroke="black" stroke-width="1.2" />
-      <line x1={item.x1} y1={11} x2={item.x2} y2={11} stroke="black" stroke-width="1.2" />
-      <line x1={item.x2} y1={11} x2={item.x2} y2={16} stroke="black" stroke-width="1.2" />
-      <text x={(item.x1 + item.x2) / 2} y={10} font-size="9"
-            text-anchor="middle" font-family="serif" fill="black">3</text>
-    {/if}
-  {/each}
-</svg>
+<style>
+  .renderer {
+    width: 100%;
+    height: 100%;
+  }
+  .renderer :global(svg) {
+    display: block;
+  }
+</style>
