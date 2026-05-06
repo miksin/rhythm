@@ -1,47 +1,100 @@
-# Svelte + TS + Vite
+# Rhythm Practice
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+A web app for reading and practicing rhythm notation. Displays 16 beats in a scrolling grid, plays them sequentially with metronome click sounds, and continuously regenerates content via a double-buffer loop.
 
-## Recommended IDE Setup
+**Live:** [miksin.github.io/rhythm](https://miksin.github.io/rhythm) · **Repo:** [github.com/miksin/rhythm](https://github.com/miksin/rhythm)
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+---
 
-## Need an official Svelte framework?
+## Features
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+- **Real music notation** — rendered by [VexFlow](https://www.vexflow.com/), not hand-crafted SVG
+- **Three difficulty levels** — Basic, Intermediate, Advanced
+- **Theme-based generation** — each 2-measure half draws from one rhythmic theme (e.g. Dotted Rhythm, Syncopation, Triplet) for musical coherence
+- **Double-buffer loop** — patterns refresh silently in the background while playing, keeping the session going indefinitely
+- **Web Audio API metronome** — lookahead-scheduled click, drift-free at any BPM
+- **Responsive** — 4×4 grid on desktop, 2×8 on mobile with auto-scroll to the active cell
 
-## Technical considerations
+---
 
-**Why use this over SvelteKit?**
+## Getting Started
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
-
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
-
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
-
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
-
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
-
-**Why include `.vscode/extensions.json`?**
-
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
-
-**Why enable `allowJs` in the TS template?**
-
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
-
-**Why is HMR not preserving my local component state?**
-
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
-
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
-
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
+```bash
+pnpm install
+pnpm dev --host 127.0.0.1   # dev server
+pnpm test                    # unit tests (Vitest)
+pnpm test:e2e                # E2E layout tests (Playwright)
+npx tsc --noEmit             # type check
 ```
+
+> Use `--host 127.0.0.1` — the default `::1` (IPv6) causes EPERM on some systems.
+
+---
+
+## Stack
+
+| Layer | Tool |
+|-------|------|
+| Framework | Svelte 5 (runes) |
+| Build | Vite |
+| Language | TypeScript |
+| Notation | VexFlow 5 |
+| Audio | Web Audio API |
+| Unit tests | Vitest |
+| E2E tests | Playwright (Chromium + WebKit/iPhone 14) |
+
+---
+
+## Architecture
+
+```
+src/
+├── App.svelte              — state, double-buffer loop, metronome wiring
+├── lib/
+│   ├── Controls.svelte     — BPM slider, difficulty buttons, play/stop
+│   ├── RhythmGrid.svelte   — CSS Grid layout (4-col desktop / 2-col mobile)
+│   ├── BeatCell.svelte     — single cell: upcoming / active / played states
+│   ├── NoteRenderer.svelte — VexFlow rendering, SVG scaling fix
+│   ├── types.ts            — NoteValue, Beat, Measure, RhythmSheet, Difficulty, CellState
+│   ├── rhythmPatterns.ts   — PATTERNS pool + THEMES (theme-based generation groups)
+│   ├── rhythmGenerator.ts  — generateHalf(), generateSheet() — theme-aware
+│   └── metronome.ts        — Web Audio API lookahead scheduler
+```
+
+### Double-buffer playback
+
+The 16-cell sheet is split into two halves. While you're hearing the front half, the back half regenerates in the background — and vice versa. This gives infinite variety with no interruption.
+
+```
+Playing:     [M0][M1] → [M2][M3] → [M0*][M1*] → ...
+Background:         ↑ regenerate M2,M3       ↑ regenerate M0,M1
+```
+
+### VexFlow SVG scaling — key gotcha
+
+VexFlow writes `style="width: Xpx; height: Ypx"` as inline styles on the SVG after every render, overriding CSS. The fix in `NoteRenderer.svelte`:
+
+```typescript
+const svg = el.querySelector('svg')
+if (svg) {
+  svg.setAttribute('viewBox', `0 0 ${REF_W} ${REF_H}`)
+  svg.style.width = '100%'   // overrides VexFlow's inline px value
+  svg.style.height = '100%'
+}
+```
+
+The E2E test `VexFlow SVGs use percentage dimensions` catches regressions.
+
+---
+
+## Difficulty Levels
+
+Each difficulty adds rhythmic vocabulary on top of the previous level.
+
+| Level | Themes |
+|-------|--------|
+| Basic | Quarter Note, Eighth Note, Mixed |
+| Intermediate | Eighth Note, Sixteenth Subdivision, Dotted Rhythm, Syncopation |
+| Advanced | Triplet, Advanced Syncopation, Mixed Advanced |
+
+Within a single playback session, each 2-measure block draws from one theme — giving the feel of a real exercise rather than random noise.
