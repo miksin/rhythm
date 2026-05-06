@@ -24,28 +24,28 @@
     return beat.map(nv => new StaveNote({ keys: ['b/4'], duration: DURATION_MAP[nv] }))
   }
 
+  // Fixed reference canvas — viewBox scaling makes it fit any cell size
+  const REF_W = 260
+  const REF_H = 180
+
   function render(el: HTMLDivElement, beat: Beat) {
     el.replaceChildren()
-    const W = el.clientWidth
-    const H = el.clientHeight
-    if (W === 0 || H === 0) return
 
     const renderer = new Renderer(el, Renderer.Backends.SVG)
-    renderer.resize(W, H)
+    renderer.resize(REF_W, REF_H)
     const ctx = renderer.getContext()
     ctx.setFillStyle('#3a2a15')
     ctx.setStrokeStyle('#3a2a15')
 
-    const staveX = 5
-    const staveY = H * 0.1
-    const staveW = W - 10
+    const staveX = 12
+    const staveY = 55   // space above for stems + triplet bracket
+    const staveW = REF_W - 24
 
     const stave = new Stave(staveX, staveY, staveW)
     stave.setContext(ctx).draw()
 
     const notes = buildNotes(beat)
 
-    // Detect triplet group
     const tripletIndices = beat.reduce<number[]>((acc, nv, i) =>
       nv === 'triplet-1/8' ? [...acc, i] : acc, [])
     const isTriplet = tripletIndices.length === 3
@@ -68,18 +68,18 @@
     voice.draw(ctx, stave)
     beams.forEach(b => b.setContext(ctx).draw())
     tuplets.forEach(t => t.setContext(ctx).draw())
+
+    // Add viewBox so CSS can scale the SVG to any cell size
+    const svg = el.querySelector('svg')
+    if (svg) {
+      svg.setAttribute('viewBox', `0 0 ${REF_W} ${REF_H}`)
+      svg.removeAttribute('width')
+      svg.removeAttribute('height')
+    }
   }
 
   $effect(() => {
-    const currentBeat = beat
-    if (!container) return
-    const el = container
-
-    render(el, currentBeat)
-
-    const ro = new ResizeObserver(() => render(el, currentBeat))
-    ro.observe(el)
-    return () => ro.disconnect()
+    if (container) render(container, beat)
   })
 </script>
 
@@ -92,5 +92,7 @@
   }
   .renderer :global(svg) {
     display: block;
+    width: 100%;
+    height: 100%;
   }
 </style>
