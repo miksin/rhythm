@@ -24,13 +24,15 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 4px;
-    width: min(90vw, 600px);
+    /* Fit within viewport: constrain by width OR by available height (90vh minus controls/padding) */
+    width: min(90vw, calc((90vh - 220px) * 13 / 9));
   }
 
-  /* Mobile: 2 columns × 8 rows */
+  /* Mobile: 2 columns × 8 rows, use full width */
   @media (max-width: 500px) {
     .grid {
       grid-template-columns: repeat(2, 1fr);
+      width: 90vw;
     }
   }
 

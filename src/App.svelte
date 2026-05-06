@@ -16,6 +16,13 @@
 
   const metronome = new Metronome()
 
+  // Auto-scroll to active cell on mobile after DOM updates
+  $effect(() => {
+    if (currentBeat < 0 || !isPlaying) return
+    if (window.innerWidth > 500) return
+    document.querySelector('.cell.active')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  })
+
   function handleBeat(beat: number): void {
     // Dim previous cell, highlight current
     if (currentBeat >= 0) cellStates[currentBeat] = 'played'
