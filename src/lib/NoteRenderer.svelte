@@ -69,12 +69,13 @@
     beams.forEach(b => b.setContext(ctx).draw())
     tuplets.forEach(t => t.setContext(ctx).draw())
 
-    // Add viewBox so CSS can scale the SVG to any cell size
+    // VexFlow sets inline style="width: Xpx; height: Ypx" — override with % values
+    // and add viewBox so the content scales to any cell size.
     const svg = el.querySelector('svg')
     if (svg) {
       svg.setAttribute('viewBox', `0 0 ${REF_W} ${REF_H}`)
-      svg.removeAttribute('width')
-      svg.removeAttribute('height')
+      svg.style.width = '100%'
+      svg.style.height = '100%'
     }
   }
 
