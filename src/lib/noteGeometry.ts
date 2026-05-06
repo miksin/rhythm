@@ -95,19 +95,28 @@ function renderPitchedGroup(items: RenderItem[], notes: NotePos[]): void {
     const x2 = notes[notes.length - 1].stemX
     items.push({ kind: 'beam', x1, x2, beamIndex: 0 })
 
-    const sixteenths = notes.filter(n => n.note === '1/16')
-    if (sixteenths.length > 0) {
-      let bx1: number, bx2: number
-      if (sixteenths.length === 1) {
-        const idx = notes.indexOf(sixteenths[0])
-        const isLast = idx === notes.length - 1
-        bx1 = isLast ? sixteenths[0].stemX - 10 : sixteenths[0].stemX
-        bx2 = isLast ? sixteenths[0].stemX : sixteenths[0].stemX + 10
+    // Secondary beams: find consecutive runs of sixteenth notes
+    const runs: NotePos[][] = []
+    let currentRun: NotePos[] = []
+    for (const pos of notes) {
+      if (pos.note === '1/16') {
+        currentRun.push(pos)
       } else {
-        bx1 = sixteenths[0].stemX
-        bx2 = sixteenths[sixteenths.length - 1].stemX
+        if (currentRun.length > 0) { runs.push([...currentRun]); currentRun = [] }
       }
-      items.push({ kind: 'beam', x1: bx1, x2: bx2, beamIndex: 1 })
+    }
+    if (currentRun.length > 0) runs.push(currentRun)
+
+    for (const run of runs) {
+      if (run.length >= 2) {
+        items.push({ kind: 'beam', x1: run[0].stemX, x2: run[run.length - 1].stemX, beamIndex: 1 })
+      } else {
+        const idx = notes.indexOf(run[0])
+        const isLast = idx === notes.length - 1
+        const bx1 = isLast ? run[0].stemX - 10 : run[0].stemX
+        const bx2 = isLast ? run[0].stemX : run[0].stemX + 10
+        items.push({ kind: 'beam', x1: bx1, x2: bx2, beamIndex: 1 })
+      }
     }
 
     if (isTriplet) {

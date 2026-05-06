@@ -78,4 +78,14 @@ describe('computeRenderItems', () => {
     expect(items.some(i => i.kind === 'triplet-bracket')).toBe(true)
     expect(items.some(i => i.kind === 'beam')).toBe(true)
   })
+
+  it('[1/16, 1/8, 1/16] produces two separate secondary beams (stubs), not one spanning beam', () => {
+    const items = computeRenderItems(['1/16', '1/8', '1/16'])
+    const beams = items.filter(i => i.kind === 'beam') as { kind: 'beam'; x1: number; x2: number; beamIndex: 0 | 1 }[]
+    const secondaryBeams = beams.filter(b => b.beamIndex === 1)
+    // Should produce 2 secondary beam stubs, not 1 spanning beam
+    expect(secondaryBeams).toHaveLength(2)
+    // They should not overlap: first stub ends before second begins
+    expect(secondaryBeams[0].x2).toBeLessThan(secondaryBeams[1].x1)
+  })
 })
