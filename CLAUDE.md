@@ -17,11 +17,13 @@ before and after each fix. Standard flow:
 ```
 1. pnpm dev --host 127.0.0.1   (background, dangerouslyDisableSandbox: true)
 2. browser_navigate → http://127.0.0.1:5173/
-3. browser_take_screenshot      (see what's broken)
+3. browser_take_screenshot filename=".screenshots/debug.png"   (see what's broken)
 4. browser_evaluate             (measure DOM dimensions)
 5. fix code → reload → screenshot again
 6. kill $(lsof -ti:5173)        (cleanup)
 ```
+
+Always save screenshots to `.screenshots/` — that directory is gitignored.
 
 ## VexFlow SVG sizing — critical gotcha
 
