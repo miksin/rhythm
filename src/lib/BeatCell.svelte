@@ -14,7 +14,8 @@
 <style>
   .cell {
     aspect-ratio: 1;
-    border: 1.5px solid #4a4a6a;
+    border: 1.5px solid #c8b89a;
+    border-radius: 4px;
     outline: 2px solid transparent;
     outline-offset: -2px;
     display: flex;
@@ -22,13 +23,14 @@
     justify-content: center;
     padding: 6px;
     box-sizing: border-box;
-    background: #1e1e3a;
+    background: #faf6ee;
+    box-shadow: 0 1px 4px rgba(80, 50, 20, 0.08);
     transition: opacity 0.15s, background 0.1s, outline-color 0.1s;
   }
 
   .cell.active {
-    outline: 2px solid #f97316;
-    background: #2d1a00;
+    outline: 2px solid #b07030;
+    background: #fff3dc;
   }
 
   .cell.played {
@@ -37,20 +39,5 @@
 
   .cell :global(svg) {
     display: block;
-  }
-
-  .cell :global(svg ellipse[fill="black"]),
-  .cell :global(svg circle[fill="black"]),
-  .cell :global(svg rect[fill="black"]) {
-    fill: #e8e8f0;
-  }
-
-  .cell :global(svg line[stroke="black"]),
-  .cell :global(svg path[stroke="black"]) {
-    stroke: #e8e8f0;
-  }
-
-  .cell :global(svg text) {
-    fill: #e8e8f0;
   }
 </style>

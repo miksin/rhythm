@@ -69,7 +69,7 @@
 </script>
 
 <main>
-  <h1>節奏練習</h1>
+  <h1>Rhythm Practice</h1>
   <Controls
     {bpm}
     {difficulty}
@@ -94,8 +94,9 @@
 
   h1 {
     font-size: 1.6rem;
-    letter-spacing: 0.08em;
-    color: #d0d0f0;
+    letter-spacing: 0.12em;
+    color: #4a3520;
     margin: 0;
+    font-weight: normal;
   }
 </style>

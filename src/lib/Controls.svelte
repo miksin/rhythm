@@ -18,9 +18,9 @@
   }: Props = $props()
 
   const DIFFICULTY_LABELS: Record<Difficulty, string> = {
-    basic: '初級',
-    intermediate: '中級',
-    advanced: '進階',
+    basic: 'Basic',
+    intermediate: 'Intermediate',
+    advanced: 'Advanced',
   }
 </script>
 
@@ -55,7 +55,7 @@
     class:playing={isPlaying}
     onclick={isPlaying ? onStop : onPlay}
   >
-    {isPlaying ? '■ 停止' : '▶ 播放'}
+    {isPlaying ? '■ Stop' : '▶ Play'}
   </button>
 </div>
 
@@ -75,19 +75,20 @@
 
   .diff-btn {
     padding: 8px 20px;
-    border: 1.5px solid #6a6a9a;
+    border: 1.5px solid #9a8060;
     background: transparent;
-    color: #aaa;
-    border-radius: 4px;
+    color: #7a6040;
+    border-radius: 3px;
     cursor: pointer;
     font-size: 14px;
+    font-family: Georgia, serif;
     transition: background 0.15s, color 0.15s;
   }
 
   .diff-btn.active {
-    background: #4a4aaa;
-    color: white;
-    border-color: #8080dd;
+    background: #7a5530;
+    color: #faf6ee;
+    border-color: #7a5530;
   }
 
   .diff-btn:disabled {
@@ -99,46 +100,50 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    color: #ccc;
+    color: #6a5030;
   }
 
   .bpm-label {
     font-size: 13px;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     width: 32px;
+    font-family: Georgia, serif;
   }
 
   input[type='range'] {
     width: 180px;
-    accent-color: #8080dd;
+    accent-color: #7a5530;
   }
 
   .bpm-value {
     font-size: 14px;
     width: 32px;
     text-align: right;
+    font-family: Georgia, serif;
   }
 
   .play-btn {
     padding: 10px 36px;
-    background: #4a4aaa;
-    color: white;
+    background: #7a5530;
+    color: #faf6ee;
     border: none;
-    border-radius: 6px;
+    border-radius: 3px;
     font-size: 16px;
+    font-family: Georgia, serif;
     cursor: pointer;
     transition: background 0.15s;
+    letter-spacing: 0.05em;
   }
 
   .play-btn:hover {
-    background: #6060cc;
+    background: #8f6640;
   }
 
   .play-btn.playing {
-    background: #aa4444;
+    background: #8a3a28;
   }
 
   .play-btn.playing:hover {
-    background: #cc5555;
+    background: #a04535;
   }
 </style>

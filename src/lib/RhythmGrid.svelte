@@ -13,10 +13,10 @@
 
 <div class="grid">
   {#each sheet as measure, measureIdx}
-    <div class="measure-row" class:last={measureIdx === 3}>
+    <div class="measure-row">
       {#each measure as beat, beatIdx}
         {@const flatIdx = measureIdx * 4 + beatIdx}
-        <div class="cell-wrap" class:last-col={beatIdx === 3}>
+        <div class="cell-wrap">
           <BeatCell {beat} state={cellStates[flatIdx]} />
         </div>
       {/each}
@@ -28,30 +28,19 @@
   .grid {
     display: flex;
     flex-direction: column;
+    gap: 8px;
     width: min(85vw, 85vh, 600px);
     aspect-ratio: 1;
-    border: 2px solid #6a6a9a;
-    border-radius: 4px;
-    overflow: hidden;
   }
 
   .measure-row {
     display: flex;
     flex: 1;
-    border-bottom: 3px solid #6a6a9a;
-  }
-
-  .measure-row.last {
-    border-bottom: none;
+    gap: 6px;
   }
 
   .cell-wrap {
     flex: 1;
-    border-right: 1.5px solid #4a4a6a;
     min-width: 0;
-  }
-
-  .cell-wrap.last-col {
-    border-right: none;
   }
 </style>
