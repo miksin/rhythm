@@ -28,7 +28,7 @@
   .grid {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
     width: min(85vw, 85vh, 600px);
     aspect-ratio: 1;
   }
@@ -36,7 +36,7 @@
   .measure-row {
     display: flex;
     flex: 1;
-    gap: 8px;
+    gap: 4px;
   }
 
   .cell-wrap {

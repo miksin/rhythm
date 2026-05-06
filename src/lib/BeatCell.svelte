@@ -15,18 +15,19 @@
   .cell {
     width: 100%;
     height: 100%;
-    border: 2px solid transparent;
-    border-radius: 4px;
+    border-radius: 3px;
+    outline: 2px solid transparent;
+    outline-offset: -1px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 6px;
+    padding: 2px;
     box-sizing: border-box;
-    transition: opacity 0.15s, background 0.1s, border-color 0.1s;
+    transition: opacity 0.15s, background 0.1s, outline-color 0.1s;
   }
 
   .cell.active {
-    border-color: #b07030;
+    outline-color: #b07030;
     background: #fff3dc;
   }
 
