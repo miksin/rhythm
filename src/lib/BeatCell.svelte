@@ -15,17 +15,19 @@
   .cell {
     aspect-ratio: 1;
     border: 1.5px solid #4a4a6a;
+    outline: 2px solid transparent;
+    outline-offset: -2px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 6px;
     box-sizing: border-box;
     background: #1e1e3a;
-    transition: opacity 0.15s, background 0.1s, border-color 0.1s;
+    transition: opacity 0.15s, background 0.1s, outline-color 0.1s;
   }
 
   .cell.active {
-    border: 3px solid #f97316;
+    outline: 2px solid #f97316;
     background: #2d1a00;
   }
 

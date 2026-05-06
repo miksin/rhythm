@@ -4,6 +4,7 @@ export class Metronome {
   private schedulerTimer: ReturnType<typeof setTimeout> | null = null
   private nextBeatTime = 0
   private beatCounter = 0
+  private running = false
 
   private readonly LOOKAHEAD = 0.1  // seconds to look ahead
   private readonly INTERVAL = 25    // ms between scheduler runs
@@ -16,6 +17,7 @@ export class Metronome {
     this.bpm = bpm
     this.beatCounter = 0
     this.nextBeatTime = this.ctx.currentTime
+    this.running = true
 
     const schedule = () => {
       const beatDuration = 60 / this.bpm
@@ -25,7 +27,7 @@ export class Metronome {
 
         const beat = this.beatCounter % 16
         const delayMs = Math.max(0, (this.nextBeatTime - this.ctx!.currentTime) * 1000)
-        setTimeout(() => onBeat(beat), delayMs)
+        setTimeout(() => { if (this.running) onBeat(beat) }, delayMs)
 
         this.beatCounter++
         this.nextBeatTime += beatDuration
@@ -38,6 +40,7 @@ export class Metronome {
   }
 
   stop(): void {
+    this.running = false
     if (this.schedulerTimer !== null) {
       clearTimeout(this.schedulerTimer)
       this.schedulerTimer = null
