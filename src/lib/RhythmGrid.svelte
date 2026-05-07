@@ -6,17 +6,17 @@
   interface Props {
     sheet: Measure[]
     cellStates: CellState[]
+    showRepeatEnd?: boolean
   }
 
-  let { sheet, cellStates }: Props = $props()
-  const regular = $derived(sheet.length === 2)
+  let { sheet, cellStates, showRepeatEnd = false }: Props = $props()
   const lastIndex = $derived(sheet.flat().length - 1)
 </script>
 
-<div class="grid" class:regular>
+<div class="grid">
   {#each sheet.flat() as beat, i}
     <div class="cell-wrap">
-      <BeatCell {beat} state={cellStates[i]} repeatEnd={regular && i === lastIndex} />
+      <BeatCell {beat} state={cellStates[i]} repeatEnd={showRepeatEnd && i === lastIndex} />
     </div>
   {/each}
 </div>
@@ -30,13 +30,7 @@
     width: min(90vw, calc((90vh - 220px) * 13 / 9));
   }
 
-  /* 2 rows instead of 4 → can be twice as wide for the same viewport height.
-     Formula derived from: grid_height = W × 9/26, solve for W at 90vh - controls */
-  .grid.regular {
-    width: min(90vw, calc((90vh - 240px) * 26 / 9));
-  }
-
-  /* Mobile: 2 columns × 8 rows (endless) or 2 × 4 rows (regular) */
+  /* Mobile: 2 columns */
   @media (max-width: 500px) {
     .grid {
       grid-template-columns: repeat(2, 1fr);

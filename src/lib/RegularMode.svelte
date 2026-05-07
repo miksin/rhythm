@@ -21,7 +21,7 @@
   let bpm = $state(60)
   let phase = $state<Phase>('idle')
   let sheet = $state<RegularSheet>(generateFromTheme(THEMES['intermediate'][0]))
-  let cellStates = $state<CellState[]>(Array(8).fill('upcoming') as CellState[])
+  let cellStates = $state<CellState[]>(Array(16).fill('upcoming') as CellState[])
   let currentBeat = $state(-1)
   let countdownActiveBeat = $state(-1)
 
@@ -46,9 +46,9 @@
       countdownActiveBeat = -1
     }
 
-    const sheetBeat = (absoluteBeat - 4) % 8
+    const sheetBeat = (absoluteBeat - 4) % 16
     if (sheetBeat === 0 && absoluteBeat > 4) {
-      cellStates = Array(8).fill('upcoming') as CellState[]
+      cellStates = Array(16).fill('upcoming') as CellState[]
       currentBeat = -1
     }
     if (currentBeat >= 0) cellStates[currentBeat] = 'played'
@@ -60,7 +60,7 @@
     absoluteBeat = -1
     countdownActiveBeat = -1
     currentBeat = -1
-    cellStates = Array(8).fill('upcoming') as CellState[]
+    cellStates = Array(16).fill('upcoming') as CellState[]
     phase = 'countdown'
     metronome.bpm = bpm
     metronome.start(bpm, handleBeat)
@@ -71,7 +71,7 @@
     phase = 'idle'
     currentBeat = -1
     countdownActiveBeat = -1
-    cellStates = Array(8).fill('upcoming') as CellState[]
+    cellStates = Array(16).fill('upcoming') as CellState[]
   }
 
   function handleBpmChange(newBpm: number): void {
@@ -140,7 +140,7 @@
 </div>
 
 <div class="grid-wrap">
-  <RhythmGrid sheet={sheet as Measure[]} {cellStates} />
+  <RhythmGrid sheet={sheet as Measure[]} {cellStates} showRepeatEnd={true} />
   {#if phase === 'countdown'}
     <div class="countdown-overlay">
       <CountdownRow activeBeat={countdownActiveBeat} />

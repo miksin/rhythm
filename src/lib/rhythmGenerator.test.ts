@@ -57,10 +57,10 @@ describe('generateHalf', () => {
 })
 
 describe('generateFromTheme', () => {
-  it('returns exactly 2 measures of 4 beats each', () => {
+  it('returns exactly 4 measures of 4 beats each', () => {
     const theme = THEMES.basic[0]
     const sheet = generateFromTheme(theme)
-    expect(sheet).toHaveLength(2)
+    expect(sheet).toHaveLength(4)
     for (const measure of sheet) expect(measure).toHaveLength(4)
   })
 

@@ -22,5 +22,10 @@ export function generateSheet(difficulty: Difficulty): RhythmSheet {
 }
 
 export function generateFromTheme(theme: Theme): RegularSheet {
-  return [generateMeasure(theme.patterns), generateMeasure(theme.patterns)]
+  return [
+    generateMeasure(theme.patterns),
+    generateMeasure(theme.patterns),
+    generateMeasure(theme.patterns),
+    generateMeasure(theme.patterns),
+  ]
 }

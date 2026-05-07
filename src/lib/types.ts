@@ -17,4 +17,4 @@ export type Difficulty = 'basic' | 'intermediate' | 'advanced'
 export type CellState = 'upcoming' | 'active' | 'played'
 
 export type GameMode = 'endless' | 'regular'
-export type RegularSheet = [Measure, Measure]
+export type RegularSheet = RhythmSheet
