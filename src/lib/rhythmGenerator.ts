@@ -1,5 +1,6 @@
-import type { Beat, Measure, RhythmSheet, Difficulty } from './types'
-import { PATTERNS, THEMES } from './rhythmPatterns'
+import type { Beat, Measure, RhythmSheet, Difficulty, RegularSheet } from './types'
+import { THEMES } from './rhythmPatterns'
+import type { Theme } from './rhythmPatterns'
 
 function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]
@@ -18,4 +19,8 @@ export function generateSheet(difficulty: Difficulty): RhythmSheet {
   const [m0, m1] = generateHalf(difficulty)
   const [m2, m3] = generateHalf(difficulty)
   return [m0, m1, m2, m3]
+}
+
+export function generateFromTheme(theme: Theme): RegularSheet {
+  return [generateMeasure(theme.patterns), generateMeasure(theme.patterns)]
 }

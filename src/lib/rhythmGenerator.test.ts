@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { generateSheet, generateHalf } from './rhythmGenerator'
-import { PATTERNS } from './rhythmPatterns'
+import { generateSheet, generateHalf, generateFromTheme } from './rhythmGenerator'
+import { PATTERNS, THEMES } from './rhythmPatterns'
 import type { Difficulty } from './types'
 
 const DURATION: Record<string, number> = {
@@ -53,5 +53,25 @@ describe('generateHalf', () => {
     const half = generateHalf('basic')
     expect(half).toHaveLength(2)
     for (const measure of half) expect(measure).toHaveLength(4)
+  })
+})
+
+describe('generateFromTheme', () => {
+  it('returns exactly 2 measures of 4 beats each', () => {
+    const theme = THEMES.basic[0]
+    const sheet = generateFromTheme(theme)
+    expect(sheet).toHaveLength(2)
+    for (const measure of sheet) expect(measure).toHaveLength(4)
+  })
+
+  it('each beat belongs to the given theme pattern pool', () => {
+    const theme = THEMES.intermediate[1] // Sixteenth Subdivision
+    const allowed = new Set(theme.patterns.map(p => JSON.stringify(p)))
+    const sheet = generateFromTheme(theme)
+    for (const measure of sheet) {
+      for (const beat of measure) {
+        expect(allowed.has(JSON.stringify(beat))).toBe(true)
+      }
+    }
   })
 })
