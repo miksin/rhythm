@@ -29,9 +29,10 @@
     width: min(90vw, calc((90vh - 220px) * 13 / 9));
   }
 
-  /* 2-measure grid doesn't need the height-based width constraint */
+  /* 2 rows instead of 4 → can be twice as wide for the same viewport height.
+     Formula derived from: grid_height = W × 9/26, solve for W at 90vh - controls */
   .grid.regular {
-    width: min(90vw, 600px);
+    width: min(90vw, calc((90vh - 240px) * 26 / 9));
   }
 
   /* Mobile: 2 columns × 8 rows (endless) or 2 × 4 rows (regular) */

@@ -139,11 +139,14 @@
   </button>
 </div>
 
-{#if phase === 'countdown'}
-  <CountdownRow activeBeat={countdownActiveBeat} />
-{/if}
-
-<RhythmGrid sheet={sheet as Measure[]} {cellStates} />
+<div class="grid-wrap">
+  <RhythmGrid sheet={sheet as Measure[]} {cellStates} />
+  {#if phase === 'countdown'}
+    <div class="countdown-overlay">
+      <CountdownRow activeBeat={countdownActiveBeat} />
+    </div>
+  {/if}
+</div>
 
 <style>
   .controls {
@@ -237,5 +240,19 @@
 
   .play-btn.playing:hover {
     background: #a04535;
+  }
+
+  .grid-wrap {
+    position: relative;
+  }
+
+  .countdown-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(250, 246, 238, 0.78);
+    border-radius: 3px;
   }
 </style>

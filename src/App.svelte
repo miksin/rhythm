@@ -8,8 +8,6 @@
 </script>
 
 <main>
-  <h1>Rhythm Practice</h1>
-
   <div class="mode-tabs">
     <button
       class="tab-btn"
@@ -55,14 +53,6 @@
       gap: 28px;
       padding: 32px 16px;
     }
-  }
-
-  h1 {
-    font-size: 1.6rem;
-    letter-spacing: 0.12em;
-    color: #4a3520;
-    margin: 0;
-    font-weight: normal;
   }
 
   .mode-tabs {
