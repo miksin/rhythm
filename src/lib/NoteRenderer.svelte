@@ -1,10 +1,10 @@
 <!-- src/lib/NoteRenderer.svelte -->
 <script lang="ts">
-  import { Renderer, Stave, StaveNote, Voice, Formatter, Beam, Tuplet } from 'vexflow'
+  import { Renderer, Stave, StaveNote, Voice, Formatter, Beam, Tuplet, BarlineType } from 'vexflow'
   import type { Beat, NoteValue } from './types'
 
-  interface Props { beat: Beat }
-  let { beat }: Props = $props()
+  interface Props { beat: Beat; repeatEnd?: boolean }
+  let { beat, repeatEnd = false }: Props = $props()
 
   let container: HTMLDivElement | undefined = $state()
 
@@ -28,7 +28,7 @@
   const REF_W = 260
   const REF_H = 180
 
-  function render(el: HTMLDivElement, beat: Beat) {
+  function render(el: HTMLDivElement, beat: Beat, repeatEnd: boolean) {
     el.replaceChildren()
 
     const renderer = new Renderer(el, Renderer.Backends.SVG)
@@ -42,6 +42,7 @@
     const staveW = REF_W - 24
 
     const stave = new Stave(staveX, staveY, staveW)
+    if (repeatEnd) stave.setEndBarType(BarlineType.REPEAT_END)
     stave.setContext(ctx).draw()
 
     const notes = buildNotes(beat)
@@ -80,7 +81,7 @@
   }
 
   $effect(() => {
-    if (container) render(container, beat)
+    if (container) render(container, beat, repeatEnd)
   })
 </script>
 

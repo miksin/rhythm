@@ -10,12 +10,13 @@
 
   let { sheet, cellStates }: Props = $props()
   const regular = $derived(sheet.length === 2)
+  const lastIndex = $derived(sheet.flat().length - 1)
 </script>
 
 <div class="grid" class:regular>
   {#each sheet.flat() as beat, i}
     <div class="cell-wrap">
-      <BeatCell {beat} state={cellStates[i]} />
+      <BeatCell {beat} state={cellStates[i]} repeatEnd={regular && i === lastIndex} />
     </div>
   {/each}
 </div>

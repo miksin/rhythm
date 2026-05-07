@@ -3,12 +3,12 @@
   import NoteRenderer from './NoteRenderer.svelte'
   import type { Beat, CellState } from './types'
 
-  interface Props { beat: Beat; state: CellState }
-  let { beat, state }: Props = $props()
+  interface Props { beat: Beat; state: CellState; repeatEnd?: boolean }
+  let { beat, state, repeatEnd = false }: Props = $props()
 </script>
 
 <div class="cell" class:active={state === 'active'} class:played={state === 'played'}>
-  <NoteRenderer {beat} />
+  <NoteRenderer {beat} {repeatEnd} />
 </div>
 
 <style>

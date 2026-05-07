@@ -4,24 +4,24 @@
   import RegularMode from './lib/RegularMode.svelte'
   import type { GameMode } from './lib/types'
 
-  let mode = $state<GameMode>('endless')
+  let mode = $state<GameMode>('regular')
 </script>
 
 <main>
   <div class="mode-tabs">
     <button
       class="tab-btn"
-      class:active={mode === 'endless'}
-      onclick={() => mode = 'endless'}
-    >
-      Endless
-    </button>
-    <button
-      class="tab-btn"
       class:active={mode === 'regular'}
       onclick={() => mode = 'regular'}
     >
       Regular
+    </button>
+    <button
+      class="tab-btn"
+      class:active={mode === 'endless'}
+      onclick={() => mode = 'endless'}
+    >
+      Endless
     </button>
   </div>
 
