@@ -28,6 +28,8 @@
   const metronome = new Metronome()
   let absoluteBeat = -1
 
+  $effect(() => () => metronome.stop())
+
   const isPlaying = $derived(phase !== 'idle')
   const themes = $derived(THEMES[difficulty])
 

@@ -16,6 +16,8 @@
 
   const metronome = new Metronome()
 
+  $effect(() => () => metronome.stop())
+
   $effect(() => {
     if (currentBeat < 0 || !isPlaying) return
     if (window.innerWidth > 500) return
