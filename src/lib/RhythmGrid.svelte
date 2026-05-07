@@ -1,17 +1,18 @@
 <!-- src/lib/RhythmGrid.svelte -->
 <script lang="ts">
   import BeatCell from './BeatCell.svelte'
-  import type { RhythmSheet, CellState } from './types'
+  import type { Measure, CellState } from './types'
 
   interface Props {
-    sheet: RhythmSheet
+    sheet: Measure[]
     cellStates: CellState[]
   }
 
   let { sheet, cellStates }: Props = $props()
+  const regular = $derived(sheet.length === 2)
 </script>
 
-<div class="grid">
+<div class="grid" class:regular>
   {#each sheet.flat() as beat, i}
     <div class="cell-wrap">
       <BeatCell {beat} state={cellStates[i]} />
@@ -28,7 +29,12 @@
     width: min(90vw, calc((90vh - 220px) * 13 / 9));
   }
 
-  /* Mobile: 2 columns × 8 rows, use full width */
+  /* 2-measure grid doesn't need the height-based width constraint */
+  .grid.regular {
+    width: min(90vw, 600px);
+  }
+
+  /* Mobile: 2 columns × 8 rows (endless) or 2 × 4 rows (regular) */
   @media (max-width: 500px) {
     .grid {
       grid-template-columns: repeat(2, 1fr);
