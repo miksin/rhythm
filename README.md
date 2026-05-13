@@ -2,7 +2,7 @@
 
 A web app for reading and practicing rhythm notation. Displays 16 beats in a scrolling grid, plays them sequentially with metronome click sounds, and continuously regenerates content via a double-buffer loop.
 
-**Live:** [miksin.github.io/rhythm](https://miksin.github.io/rhythm) · **Repo:** [github.com/miksin/rhythm](https://github.com/miksin/rhythm)
+**Live:** [rhythm.miksin.art](https://rhythm.miksin.art/) · **Repo:** [github.com/miksin/rhythm](https://github.com/miksin/rhythm)
 
 ---
 
